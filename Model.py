@@ -6,7 +6,7 @@ class Club:
         self.poin = poin
 
     def tampil(self):
-        return f"{self.id} | {self.nama} | {self.liga} | Poin: {self.poin}"
+        return f"{self.id} | {self.nama} | {self.liga} | {self.poin}"
 
 
 class Node:
@@ -20,65 +20,30 @@ class LinkedList:
         self.head = None
 
     def tambah(self, data):
-        new_node = Node(data)
-
-        if self.head is None:
-            self.head = new_node
+        node = Node(data)
+        if not self.head:
+            self.head = node
             return
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+        cur.next = node
 
-        current = self.head
-        while current.next:
-            current = current.next
-        current.next = new_node
-
-    def tampil_semua(self):
+    def tampil(self):
         hasil = []
-        current = self.head
-
-        while current:
-            hasil.append(current.data)
-            current = current.next
-
+        cur = self.head
+        while cur:
+            hasil.append(cur.data)
+            cur = cur.next
         return hasil
-
-    def hapus(self, id_club):
-        current = self.head
-        prev = None
-
-        while current:
-            if current.data.id == id_club:
-                if prev:
-                    prev.next = current.next
-                else:
-                    self.head = current.next
-                return True
-
-            prev = current
-            current = current.next
-
-        return False
-
-    def update(self, id_club, nama, liga, poin):
-        current = self.head
-
-        while current:
-            if current.data.id == id_club:
-                current.data.nama = nama
-                current.data.liga = liga
-                current.data.poin = poin
-                return True
-
-            current = current.next
-
-        return False
 
 
 class Stack:
     def __init__(self):
         self.data = []
 
-    def push(self, item):
-        self.data.append(item)
+    def push(self, x):
+        self.data.append(x)
 
     def tampil(self):
         return self.data
@@ -88,28 +53,8 @@ class Queue:
     def __init__(self):
         self.data = []
 
-    def enqueue(self, item):
-        self.data.append(item)
+    def enqueue(self, x):
+        self.data.append(x)
 
     def tampil(self):
         return self.data
-
-def cari_club(data, keyword):
-    hasil = []
-
-    for club in data:
-        if keyword.lower() in club.nama.lower():
-            hasil.append(club)
-
-    return hasil
-
-
-def bubble_sort_poin(data):
-    n = len(data)
-
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if data[j].poin < data[j + 1].poin:
-                data[j], data[j + 1] = data[j + 1], data[j]
-
-    return data

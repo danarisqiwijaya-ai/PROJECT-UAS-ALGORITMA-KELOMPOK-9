@@ -1,135 +1,57 @@
 # FOOTBALL RECOMMENDATION SYSTEM
 
-## 1. Deskripsi Proyek
-Aplikasi ini adalah sistem rekomendasi klub sepak bola Eropa berbasis Python GUI (Tkinter) yang menerapkan berbagai struktur data dan algoritma seperti Linked List, Stack, Queue, Sorting, dan Searching.
-
-Aplikasi memungkinkan pengguna untuk:
-- Menambah data klub
-- Mengubah data klub
-- Menghapus data klub
-- Mencari klub
-- Mengurutkan klub berdasarkan poin
-- Melihat history input
-- Mengelola watchlist
-- Menampilkan data dalam GUI
+## DESKRIPSI
+Aplikasi ini adalah sistem rekomendasi klub sepak bola berbasis Python dengan GUI Tkinter.  
+Sistem ini mengimplementasikan konsep Struktur Data dan Algoritma untuk mengelola data klub sepak bola.
 
 ---
 
-## 2. Tujuan
-- Mengimplementasikan materi Struktur Data dalam aplikasi nyata
-- Melatih pemahaman Linked List, Stack, Queue, Sorting, Searching
-- Membuat aplikasi GUI menggunakan Tkinter
-- Membuat sistem rekomendasi sederhana berbasis data klub
+## FITUR APLIKASI
+- Tambah data klub (Create)
+- Tampilkan data klub
+- Update data klub
+- Hapus data klub
+- Pencarian klub berdasarkan nama
+- Pengurutan klub berdasarkan poin
+- History pencarian (Stack)
+- Watchlist klub (Queue)
+- Rekomendasi Top Club
 
 ---
 
-## 3. Teknologi yang Digunakan
-- Python
-- Tkinter (GUI)
-- Struktur Data Manual (tanpa library eksternal)
+## STRUKTUR DATA YANG DIGUNAKAN
+- Linked List → penyimpanan data klub
+- Stack → menyimpan history pencarian
+- Queue → menyimpan watchlist
 
 ---
 
-## 4. Struktur Data yang Digunakan
-
-### 4.1 Class & Object
-Digunakan untuk merepresentasikan data klub sepak bola:
-- id
-- nama klub
-- liga
-- poin
+## ALGORITMA YANG DIGUNAKAN
+- Bubble Sort → mengurutkan klub berdasarkan poin
+- Linear Search → pencarian berdasarkan nama
+- Traversal Linked List → menampilkan semua data
 
 ---
 
-### 4.2 Linked List
-Digunakan untuk menyimpan data klub secara dinamis tanpa array statis.
+## KONSEP PEMROGRAMAN
+- Object Oriented Programming (Class & Object)
+- Modular logic dalam struktur program
+- GUI menggunakan Tkinter
 
-Fungsi:
-- tambah data
-- update data
-- hapus data
-- tampil semua data
+## CARA MENJALANKAN PROGRAM
+1. Install Python
+2. Jalankan file utama:
+```bash
+python main.py
 
----
-
-### 4.3 Stack
-Digunakan untuk menyimpan history input (Last In First Out).
-
-Contoh:
-- klub yang terakhir ditambahkan akan muncul pertama di history
-
----
-
-### 4.4 Queue
-Digunakan untuk watchlist (First In First Out).
-
-Contoh:
-- klub yang masuk pertama akan keluar pertama
-
----
-
-### 4.5 Searching
-- Linear Search digunakan untuk mencari klub berdasarkan nama
-
----
-
-### 4.6 Sorting
-- Bubble Sort digunakan untuk mengurutkan klub berdasarkan poin tertinggi
-
----
-
-## 5. Fitur Aplikasi
-
-### 5.1 CRUD
-- Create (Tambah klub)
-- Read (Tampil semua klub)
-- Update (Edit klub)
-- Delete (Hapus klub)
-
----
-
-### 5.2 Searching
-- Mencari klub berdasarkan nama
-
----
-
-### 5.3 Sorting
-- Mengurutkan klub berdasarkan poin tertinggi
-
----
-
-### 5.4 History (Stack)
-- Menyimpan riwayat input klub
-
----
-
-### 5.5 Watchlist (Queue)
-- Menyimpan daftar antrian klub
-
----
-
-## 6. Tampilan GUI
-Aplikasi menggunakan Tkinter dengan komponen:
-- Entry (input data)
-- Button (aksi)
-- Listbox (output data)
-- Frame (layout)
-
----
-
-## 7. Cara Menjalankan Program
-1. Pastikan Python sudah terinstall
-2. Simpan file sebagai:
-
- 
- 
- 8.Anggota Kelompok
+ Anggota Kelompok
 - Dana Risqi Wijaya
 -  Pandu WInata
 -  Muhammad Hibatullah
 - Gita Tri Juliet Marbun 
 - Sekar Ayu Maheswari
 
-Cara Menjalankan
+
+
 ```bash
 python main.py

@@ -1,10 +1,6 @@
 from tkinter import *
-from tkinter import ttk, messagebox
-import json
+from tkinter import messagebox
 
-# =========================
-# CLASS OBJECT
-# =========================
 class Club:
     def __init__(self, id_club, nama, liga, poin):
         self.id = id_club
@@ -13,274 +9,302 @@ class Club:
         self.poin = poin
 
     def tampil(self):
-        return f"{self.id} | {self.nama} | {self.liga} | {self.poin}"
+        return str(self.id) + " | " + self.nama + " | " + self.liga + " | Poin: " + str(self.poin)
 
-# =========================
-# LINKED LIST
-# =========================
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
 
+
 class LinkedList:
     def __init__(self):
         self.head = None
 
+    def cek_id(self, id_club):
+        current = self.head
+        while current:
+            if current.data.id == id_club:
+                return True
+            current = current.next
+        return False
+
     def tambah(self, data):
-        n = Node(data)
-        if not self.head:
-            self.head = n
+        new_node = Node(data)
+
+        if self.head is None:
+            self.head = new_node
             return
-        c = self.head
-        while c.next:
-            c = c.next
-        c.next = n
+
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node
 
     def tampil_semua(self):
-        r = []
-        c = self.head
-        while c:
-            r.append(c.data)
-            c = c.next
-        return r
+        hasil = []
+        current = self.head
 
-    def hapus(self, idc):
-        c = self.head
-        p = None
-        while c:
-            if c.data.id == idc:
-                if p:
-                    p.next = c.next
+        while current:
+            hasil.append(current.data)
+            current = current.next
+
+        return hasil
+
+    def hapus(self, id_club):
+        current = self.head
+        prev = None
+
+        while current:
+            if current.data.id == id_club:
+                if prev:
+                    prev.next = current.next
                 else:
-                    self.head = c.next
+                    self.head = current.next
                 return True
-            p = c
-            c = c.next
+
+            prev = current
+            current = current.next
+
         return False
 
-    def update(self, idc, n, l, p):
-        c = self.head
-        while c:
-            if c.data.id == idc:
-                c.data.nama = n
-                c.data.liga = l
-                c.data.poin = p
+    def update(self, id_club, nama_baru, liga_baru, poin_baru):
+        current = self.head
+
+        while current:
+            if current.data.id == id_club:
+                current.data.nama = nama_baru
+                current.data.liga = liga_baru
+                current.data.poin = poin_baru
                 return True
-            c = c.next
+            current = current.next
         return False
 
-# =========================
-# STACK & QUEUE
-# =========================
+
 class Stack:
     def __init__(self):
         self.data = []
-    def push(self, x):
-        self.data.append(x)
+
+    def push(self, item):
+        self.data.append(item)
+
     def tampil(self):
         return self.data
+
 
 class Queue:
     def __init__(self):
         self.data = []
-    def enqueue(self, x):
-        self.data.append(x)
+
+    def enqueue(self, item):
+        self.data.append(item)
+
     def tampil(self):
         return self.data
 
-# =========================
-# GLOBAL
-# =========================
+
+def cari_club(data, keyword):
+    return [c for c in data if keyword.lower() in c.nama.lower()]
+
+
+def bubble_sort_poin(data, mode="desc"):
+    n = len(data)
+
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if mode == "desc":
+                if data[j].poin < data[j + 1].poin:
+                    data[j], data[j + 1] = data[j + 1], data[j]
+            else:
+                if data[j].poin > data[j + 1].poin:
+                    data[j], data[j + 1] = data[j + 1], data[j]
+
+    return data
+
+
+def binary_search(data, key):
+    data = sorted(data, key=lambda x: x.nama.lower())
+    l, r = 0, len(data) - 1
+
+    while l <= r:
+        m = (l + r) // 2
+
+        if key.lower() in data[m].nama.lower():
+            return data[m]
+        elif key.lower() < data[m].nama.lower():
+            r = m - 1
+        else:
+            l = m + 1
+
+    return None
+
+
 club_list = LinkedList()
 history_stack = Stack()
 watchlist_queue = Queue()
 
-club_dict = {}
-liga_set = set()
+root = Tk()
+root.title("Football Recommendation System")
+root.geometry("980x720")
+root.configure(bg="#101820")
 
-FILE = "data_club.json"
 
-# =========================
-# SAVE LOAD
-# =========================
-def simpan():
-    data = []
-    for c in club_list.tampil_semua():
-        data.append({
-            "id": c.id,
-            "nama": c.nama,
-            "liga": c.liga,
-            "poin": c.poin
-        })
-    with open(FILE, "w") as f:
-        json.dump(data, f)
+def clear_input():
+    entry_id.delete(0, END)
+    entry_nama.delete(0, END)
+    entry_liga.delete(0, END)
+    entry_poin.delete(0, END)
 
-def load():
+
+def refresh_data():
+    listbox.delete(0, END)
+    for club in club_list.tampil_semua():
+        listbox.insert(END, club.tampil())
+
+
+def validasi_input():
+    if entry_id.get() == "" or entry_nama.get() == "" or entry_liga.get() == "" or entry_poin.get() == "":
+        messagebox.showerror("Error", "Input tidak boleh kosong")
+        return False
+
     try:
-        with open(FILE, "r") as f:
-            data = json.load(f)
-        for d in data:
-            club_list.tambah(Club(d["id"], d["nama"], d["liga"], d["poin"]))
+        int(entry_id.get())
+        int(entry_poin.get())
     except:
-        pass
-
-# =========================
-# VALIDASI INPUT (NEW)
-# =========================
-def validasi():
-    if eid.get() == "" or ena.get() == "" or eli.get() == "" or epo.get() == "":
-        messagebox.showwarning("Warning", "Semua field harus diisi!")
-        return False
-
-    if not eid.get().isdigit():
-        messagebox.showerror("Error", "ID harus angka!")
-        return False
-
-    if not epo.get().isdigit():
-        messagebox.showerror("Error", "Poin harus angka!")
+        messagebox.showerror("Error", "ID dan Poin harus angka")
         return False
 
     return True
 
-# =========================
-# REFRESH TABLE
-# =========================
-def refresh():
-    for i in tree.get_children():
-        tree.delete(i)
 
-    for c in club_list.tampil_semua():
-        tree.insert("", END, values=(c.id, c.nama, c.liga, c.poin))
-
-# =========================
-# CRUD
-# =========================
-def tambah():
-    if not validasi():
+def tambah_club():
+    if not validasi_input():
         return
 
-    c = Club(int(eid.get()), ena.get(), eli.get(), int(epo.get()))
-    club_list.tambah(c)
+    id_club = int(entry_id.get())
 
-    club_dict[c.id] = c
-    liga_set.add(c.liga)
-
-    simpan()
-    refresh()
-
-def update():
-    if not validasi():
+    if club_list.cek_id(id_club):
+        messagebox.showwarning("Warning", "ID sudah ada")
         return
 
-    club_list.update(int(eid.get()), ena.get(), eli.get(), int(epo.get()))
-    simpan()
-    refresh()
+    club = Club(id_club, entry_nama.get(), entry_liga.get(), int(entry_poin.get()))
+    club_list.tambah(club)
 
-def hapus():
-    if eid.get() == "":
-        messagebox.showwarning("Warning", "ID harus diisi!")
+    messagebox.showinfo("Sukses", "Club berhasil ditambahkan")
+    refresh_data()
+    clear_input()
+
+
+def update_club():
+    if not validasi_input():
         return
 
-    if not eid.get().isdigit():
-        messagebox.showerror("Error", "ID harus angka!")
-        return
+    club_list.update(
+        int(entry_id.get()),
+        entry_nama.get(),
+        entry_liga.get(),
+        int(entry_poin.get())
+    )
 
-    club_list.hapus(int(eid.get()))
-    simpan()
-    refresh()
+    messagebox.showinfo("Sukses", "Data berhasil diupdate")
+    refresh_data()
 
-# =========================
-# SEARCH & SORT
-# =========================
-def cari():
-    key = ena.get().lower()
-    result = [c for c in club_list.tampil_semua() if key in c.nama.lower()]
 
-    for i in tree.get_children():
-        tree.delete(i)
+def hapus_club():
+    club_list.hapus(int(entry_id.get()))
+    messagebox.showinfo("Sukses", "Data dihapus")
+    refresh_data()
 
-    for c in result:
-        tree.insert("", END, values=(c.id, c.nama, c.liga, c.poin))
 
 def top3():
-    data = sorted(club_list.tampil_semua(), key=lambda x: x.poin, reverse=True)
+    data = bubble_sort_poin(club_list.tampil_semua(), "desc")[:3]
 
-    for i in tree.get_children():
-        tree.delete(i)
+    listbox.delete(0, END)
+    listbox.insert(END, "=== TOP 3 CLUB ===")
 
-    for c in data[:3]:
-        tree.insert("", END, values=(c.id, c.nama, c.liga, c.poin))
+    for c in data:
+        listbox.insert(END, c.tampil())
 
-# =========================
-# UI
-# =========================
-root = Tk()
-root.title("⚽ Football System Pro")
-root.geometry("1100x650")
-root.configure(bg="#0b1220")
 
-Label(
-    root,
-    text="⚽ FOOTBALL RECOMMENDATION SYSTEM",
-    bg="#0b1220",
-    fg="#facc15",
-    font=("Arial", 20, "bold")
-).pack(pady=10)
+def statistik():
+    data = club_list.tampil_semua()
 
-main = Frame(root, bg="#0b1220")
-main.pack()
+    liga_count = {}
 
-# INPUT
-inp = Frame(main, bg="#111c2e", padx=10, pady=10)
-inp.grid(row=0, column=0, padx=10)
+    for c in data:
+        liga_count[c.liga] = liga_count.get(c.liga, 0) + 1
 
-Label(inp, text="ID", bg="#111c2e", fg="white").grid(row=0, column=0)
-eid = Entry(inp); eid.grid(row=0, column=1)
+    listbox.delete(0, END)
+    listbox.insert(END, "=== STATISTIK LIGA ===")
 
-Label(inp, text="Nama", bg="#111c2e", fg="white").grid(row=1, column=0)
-ena = Entry(inp); ena.grid(row=1, column=1)
+    for k, v in liga_count.items():
+        listbox.insert(END, f"{k} : {v} club")
 
-Label(inp, text="Liga", bg="#111c2e", fg="white").grid(row=2, column=0)
-eli = Entry(inp); eli.grid(row=2, column=1)
 
-Label(inp, text="Poin", bg="#111c2e", fg="white").grid(row=3, column=0)
-epo = Entry(inp); epo.grid(row=3, column=1)
+def cari_data():
+    hasil = cari_club(club_list.tampil_semua(), entry_nama.get())
 
-# TABLE
-table = Frame(main, bg="#0b1220")
-table.grid(row=0, column=1)
+    listbox.delete(0, END)
 
-cols = ("ID", "CLUB", "LIGA", "POIN")
+    for c in hasil:
+        listbox.insert(END, c.tampil())
 
-tree = ttk.Treeview(table, columns=cols, show="headings", height=22)
 
-for c in cols:
-    tree.heading(c, text=c)
-    tree.column(c, width=130)
+def lihat_history():
+    listbox.delete(0, END)
+    for i in history_stack.tampil():
+        listbox.insert(END, i)
 
-tree.pack()
 
-# BUTTON
-btn = Frame(main, bg="#0b1220")
-btn.grid(row=0, column=2, padx=10)
+def lihat_watchlist():
+    listbox.delete(0, END)
+    for i in watchlist_queue.tampil():
+        listbox.insert(END, i)
 
-Button(btn, text="ADD", width=15, bg="#22c55e", command=tambah).grid()
-Button(btn, text="UPDATE", width=15, bg="#eab308", command=update).grid()
-Button(btn, text="DELETE", width=15, bg="#ef4444", command=hapus).grid()
-Button(btn, text="SEARCH", width=15, bg="#3b82f6", command=cari).grid()
-Button(btn, text="TOP 3", width=15, bg="#f97316", command=top3).grid()
-Button(btn, text="REFRESH", width=15, bg="#64748b", command=refresh).grid()
 
-# DATA AWAL
-load()
+title = Label(root, text="FOOTBALL RECOMMENDATION SYSTEM",
+              bg="#101820", fg="white", font=("Arial", 20, "bold"))
+title.pack(pady=10)
 
-if len(club_list.tampil_semua()) == 0:
-    club_list.tambah(Club(1,"Real Madrid","La Liga",95))
-    club_list.tambah(Club(2,"Man City","EPL",97))
-    club_list.tambah(Club(3,"Barcelona","La Liga",90))
-    club_list.tambah(Club(4,"Liverpool","EPL",88))
-    club_list.tambah(Club(5,"Bayern","Bundesliga",92))
+frame_input = Frame(root, bg="#101820")
+frame_input.pack()
 
-refresh()
+
+Label(frame_input, text="ID", fg="white", bg="#101820").grid(row=0, column=0)
+entry_id = Entry(frame_input); entry_id.grid(row=0, column=1)
+
+Label(frame_input, text="Nama", fg="white", bg="#101820").grid(row=1, column=0)
+entry_nama = Entry(frame_input); entry_nama.grid(row=1, column=1)
+
+Label(frame_input, text="Liga", fg="white", bg="#101820").grid(row=2, column=0)
+entry_liga = Entry(frame_input); entry_liga.grid(row=2, column=1)
+
+Label(frame_input, text="Poin", fg="white", bg="#101820").grid(row=3, column=0)
+entry_poin = Entry(frame_input); entry_poin.grid(row=3, column=1)
+
+
+listbox = Listbox(root, width=120, height=20)
+listbox.pack(pady=15)
+
+
+frame_btn = Frame(root, bg="#101820")
+frame_btn.pack()
+
+
+Button(frame_btn, text="Tambah", command=tambah_club).grid(row=0, column=0)
+Button(frame_btn, text="Update", command=update_club).grid(row=0, column=1)
+Button(frame_btn, text="Hapus", command=hapus_club).grid(row=0, column=2)
+Button(frame_btn, text="Cari", command=cari_data).grid(row=1, column=0)
+Button(frame_btn, text="Top 3", command=top3).grid(row=1, column=1)
+Button(frame_btn, text="Statistik", command=statistik).grid(row=1, column=2)
+Button(frame_btn, text="History", command=lihat_history).grid(row=2, column=0)
+Button(frame_btn, text="Watchlist", command=lihat_watchlist).grid(row=2, column=1)
+
+
+club_list.tambah(Club(1, "Real Madrid", "La Liga", 95))
+club_list.tambah(Club(2, "Man City", "EPL", 97))
+club_list.tambah(Club(3, "Barcelona", "La Liga", 90))
+
+refresh_data()
 root.mainloop()

@@ -93,3 +93,23 @@ class Queue:
 
     def tampil(self):
         return self.data
+
+def cari_club(data, keyword):
+    hasil = []
+
+    for club in data:
+        if keyword.lower() in club.nama.lower():
+            hasil.append(club)
+
+    return hasil
+
+
+def bubble_sort_poin(data):
+    n = len(data)
+
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if data[j].poin < data[j + 1].poin:
+                data[j], data[j + 1] = data[j + 1], data[j]
+
+    return data

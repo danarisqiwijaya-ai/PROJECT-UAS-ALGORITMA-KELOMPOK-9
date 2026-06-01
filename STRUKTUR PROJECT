@@ -1,0 +1,6 @@
+football_system/
+│
+├── model.py
+├── logic.py
+├── main.py
+└── README.md

@@ -1,0 +1,289 @@
+from tkinter import *
+
+class Club:
+    def __init__(self, id_club, nama, liga, poin):
+        self.id = id_club
+        self.nama = nama
+        self.liga = liga
+        self.poin = poin
+
+    def tampil(self):
+        return str(self.id) + " | " + self.nama + " | " + self.liga + " | " + str(self.poin)
+
+
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def tambah(self, data):
+        node = Node(data)
+        if not self.head:
+            self.head = node
+            return
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+        cur.next = node
+
+    def tampil(self):
+        res = []
+        cur = self.head
+        while cur:
+            res.append(cur.data)
+            cur = cur.next
+        return res
+
+    def hapus(self, idv):
+        cur = self.head
+        prev = None
+        while cur:
+            if cur.data.id == idv:
+                if prev:
+                    prev.next = cur.next
+                else:
+                    self.head = cur.next
+                return
+            prev = cur
+            cur = cur.next
+
+
+class Stack:
+    def __init__(self):
+        self.data = []
+
+    def push(self, x):
+        self.data.append(x)
+
+    def tampil(self):
+        return self.data
+
+
+class Queue:
+    def __init__(self):
+        self.data = []
+
+    def enqueue(self, x):
+        self.data.append(x)
+
+    def tampil(self):
+        return self.data
+
+
+club_list = LinkedList()
+history = Stack()
+watchlist = Queue()
+todo = []
+log = ()
+
+
+def linear_search(data, key):
+    return [c for c in data if key.lower() in c.nama.lower()]
+
+
+def binary_search(data, key):
+    data = sorted(data, key=lambda x: x.nama.lower())
+    l, r = 0, len(data) - 1
+
+    while l <= r:
+        m = (l + r) // 2
+        if data[m].nama.lower() == key.lower():
+            return [data[m]]
+        elif data[m].nama.lower() < key.lower():
+            l = m + 1
+        else:
+            r = m - 1
+    return []
+
+
+def bubble_sort(data):
+    n = len(data)
+    for i in range(n):
+        for j in range(n - i - 1):
+            if data[j].poin < data[j + 1].poin:
+                data[j], data[j + 1] = data[j + 1], data[j]
+    return data
+
+
+def rekomendasi(data):
+    temp = []
+    for c in data:
+        score = c.poin
+        if c.liga.lower() in ["premier league", "la liga"]:
+            score += 5
+        temp.append((c, score))
+
+    temp.sort(key=lambda x: x[1], reverse=True)
+    return [x[0] for x in temp[:3]]
+
+
+root = Tk()
+root.title("Football System")
+root.geometry("1000x750")
+
+Label(root, text="FOOTBALL RECOMMENDATION SYSTEM", font=("Arial", 18)).pack()
+
+frame = Frame(root)
+frame.pack()
+
+entry_id = Entry(frame)
+entry_nama = Entry(frame)
+entry_liga = Entry(frame)
+entry_poin = Entry(frame)
+
+entry_id.grid(row=0, column=1)
+entry_nama.grid(row=1, column=1)
+entry_liga.grid(row=2, column=1)
+entry_poin.grid(row=3, column=1)
+
+Label(frame, text="ID").grid(row=0, column=0)
+Label(frame, text="Nama").grid(row=1, column=0)
+Label(frame, text="Liga").grid(row=2, column=0)
+Label(frame, text="Poin").grid(row=3, column=0)
+
+listbox = Listbox(root, width=120, height=25)
+listbox.pack()
+
+
+def refresh(data):
+    listbox.delete(0, END)
+    for c in data:
+        listbox.insert(END, c.tampil())
+
+
+def valid():
+    if entry_id.get() == "" or entry_nama.get() == "" or entry_liga.get() == "" or entry_poin.get() == "":
+        return False
+    if not entry_poin.get().isdigit():
+        return False
+    return True
+
+
+def add():
+    global log
+
+    if not valid():
+        return
+
+    c = Club(int(entry_id.get()),
+             entry_nama.get(),
+             entry_liga.get(),
+             int(entry_poin.get()))
+
+    club_list.tambah(c)
+
+    history.push(entry_nama.get())
+    watchlist.enqueue(entry_nama.get())
+
+    log = log + (f"ADD {c.nama}",)
+
+    refresh(club_list.tampil())
+
+
+def delete():
+    club_list.hapus(int(entry_id.get()))
+    refresh(club_list.tampil())
+
+
+def update():
+    for c in club_list.tampil():
+        if c.id == int(entry_id.get()):
+            c.nama = entry_nama.get()
+            c.liga = entry_liga.get()
+            c.poin = int(entry_poin.get())
+    refresh(club_list.tampil())
+
+
+def search():
+    refresh(linear_search(club_list.tampil(), entry_nama.get()))
+
+
+def binary():
+    refresh(binary_search(club_list.tampil(), entry_nama.get()))
+
+
+def sort_data():
+    refresh(bubble_sort(club_list.tampil()))
+
+
+def recommend():
+    refresh(rekomendasi(club_list.tampil()))
+
+
+def filter_liga():
+    liga = entry_liga.get()
+    refresh([c for c in club_list.tampil() if c.liga.lower() == liga.lower()])
+
+
+def reset():
+    refresh(club_list.tampil())
+
+
+def clear():
+    listbox.delete(0, END)
+
+
+def detail():
+    listbox.delete(0, END)
+    for c in club_list.tampil():
+        listbox.insert(END, f"{c.tampil()} | DETAIL: klub kuat di {c.liga}")
+
+
+def ranking():
+    data = bubble_sort(club_list.tampil())[:5]
+    refresh(data)
+
+
+def todo_add():
+    todo.append(entry_nama.get())
+
+
+def todo_view():
+    listbox.delete(0, END)
+    for i, t in enumerate(todo):
+        listbox.insert(END, f"{i+1}. {t}")
+
+
+def log_view():
+    listbox.delete(0, END)
+    for l in log:
+        listbox.insert(END, l)
+
+
+Button(frame, text="Add", command=add).grid(row=4, column=0)
+Button(frame, text="Update", command=update).grid(row=4, column=1)
+Button(frame, text="Delete", command=delete).grid(row=4, column=2)
+
+Button(frame, text="Search", command=search).grid(row=5, column=0)
+Button(frame, text="Binary", command=binary).grid(row=5, column=1)
+Button(frame, text="Sort", command=sort_data).grid(row=5, column=2)
+
+Button(frame, text="Recommend", command=recommend).grid(row=6, column=1)
+
+Button(frame, text="Filter Liga", command=filter_liga).grid(row=7, column=0)
+Button(frame, text="Reset", command=reset).grid(row=7, column=1)
+Button(frame, text="Clear", command=clear).grid(row=7, column=2)
+
+Button(frame, text="Detail", command=detail).grid(row=8, column=0)
+Button(frame, text="Ranking Top 5", command=ranking).grid(row=8, column=1)
+
+Button(frame, text="ToDo", command=todo_add).grid(row=9, column=0)
+Button(frame, text="View ToDo", command=todo_view).grid(row=9, column=1)
+
+Button(frame, text="Log", command=log_view).grid(row=9, column=2)
+
+
+club_list.tambah(Club(1, "Real Madrid", "La Liga", 95))
+club_list.tambah(Club(2, "Manchester City", "Premier League", 97))
+club_list.tambah(Club(3, "Barcelona", "La Liga", 90))
+club_list.tambah(Club(4, "Liverpool", "Premier League", 88))
+club_list.tambah(Club(5, "Bayern Munich", "Bundesliga", 92))
+
+refresh(club_list.tampil())
+
+root.mainloop()

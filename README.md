@@ -120,7 +120,10 @@ Aplikasi menggunakan Tkinter dengan komponen:
 ## 7. Cara Menjalankan Program
 1. Pastikan Python sudah terinstall
 2. Simpan file sebagai:
- Anggota Kelompok
+
+ 
+ 
+ 8.Anggota Kelompok
 - Dana Risqi Wijaya
 -  Pandu WInata
 -  Muhammad Hibatullah

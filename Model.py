@@ -21,55 +21,43 @@ class LinkedList:
 
     def tambah(self, data):
         new_node = Node(data)
-
-        if self.head is None:
+        if not self.head:
             self.head = new_node
             return
-
-        current = self.head
-        while current.next:
-            current = current.next
-        current.next = new_node
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+        cur.next = new_node
 
     def tampil_semua(self):
-        hasil = []
-        current = self.head
-
-        while current:
-            hasil.append(current.data)
-            current = current.next
-
-        return hasil
+        result = []
+        cur = self.head
+        while cur:
+            result.append(cur.data)
+            cur = cur.next
+        return result
 
     def hapus(self, id_club):
-        current = self.head
-        prev = None
-
-        while current:
-            if current.data.id == id_club:
+        cur, prev = self.head, None
+        while cur:
+            if cur.data.id == id_club:
                 if prev:
-                    prev.next = current.next
+                    prev.next = cur.next
                 else:
-                    self.head = current.next
+                    self.head = cur.next
                 return True
-
-            prev = current
-            current = current.next
-
+            prev, cur = cur, cur.next
         return False
 
     def update(self, id_club, nama, liga, poin):
-        current = self.head
-
-        while current:
-            if current.data.id == id_club:
-                current.data.nama = nama
-                current.data.liga = liga
-                current.data.poin = poin
+        cur = self.head
+        while cur:
+            if cur.data.id == id_club:
+                cur.data.nama = nama
+                cur.data.liga = liga
+                cur.data.poin = poin
                 return True
-
-            current = current.next
-
+            cur = cur.next
         return False
 
 

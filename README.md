@@ -1,23 +1,24 @@
 # Football Recommendation System
 
-Deskripsi
-Aplikasi manajemen data club sepak bola berbasis Python menggunakan struktur data Linked List, Stack, Queue, dan GUI Tkinter.
+## Deskripsi
+Aplikasi ini adalah sistem rekomendasi klub sepak bola Eropa berbasis Python menggunakan Tkinter dan struktur data.
 
- Fitur
-- Tambah club
-- Update club
-- Hapus club
-- Cari club
-- Urutkan poin
-- History pencarian (Stack)
-- Watchlist (Queue)
-
- Teknologi
-- Python
-- Tkinter
+## Fitur
+- CRUD Club
 - Linked List
 - Stack
 - Queue
+- Array (ToDo List)
+- Linear Search
+- Binary Search
+- Bubble Sort
+- Sistem Rekomendasi
+
+## Struktur Project
+- main.py → GUI Tkinter
+- logic.py → struktur data & algoritma
+- module.py → variabel global
+- README.md → dokumentasi
 
  Anggota Kelompok
 - Dana Risqi Wijaya

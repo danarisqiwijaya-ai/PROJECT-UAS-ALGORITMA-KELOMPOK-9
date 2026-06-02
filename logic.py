@@ -1,32 +1,34 @@
-def cari_club(data, key):
-    return [c for c in data if key.lower() in c.nama.lower()]
+liga_map = {}
+
+def cari_club(data, keyword):
+
+    hasil = []
+
+    for c in data:
+        if keyword.lower() in c.get_nama().lower():
+            hasil.append(c)
+
+    return hasil
 
 
 def bubble_sort(data):
+
     n = len(data)
 
     for i in range(n):
         for j in range(n - i - 1):
-            if data[j].poin < data[j + 1].poin:
+
+            if data[j].get_poin() < data[j + 1].get_poin():
                 data[j], data[j + 1] = data[j + 1], data[j]
 
     return data
 
 
-def binary_search(data, key):
-    data = sorted(data, key=lambda x: x.nama.lower())
+def tambah_ke_liga(club):
 
-    l, r = 0, len(data) - 1
+    liga = club.get_liga()
 
-    while l <= r:
-        m = (l + r) // 2
+    if liga not in liga_map:
+        liga_map[liga] = []
 
-        if key.lower() in data[m].nama.lower():
-            return data[m]
-
-        elif key.lower() < data[m].nama.lower():
-            r = m - 1
-        else:
-            l = m + 1
-
-    return None
+    liga_map[liga].append(club)

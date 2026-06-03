@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from models import Handphone
+from algorithms import linear_search_recommendation, selection_sort_by_price
+from data_structures import HistoryLinkedList
+
 class RecommendationApp:
     def __init__(self, root):
         self.root = root

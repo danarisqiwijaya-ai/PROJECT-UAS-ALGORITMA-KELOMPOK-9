@@ -5,7 +5,7 @@ class Handphone:
         self.harga = harga        
         self.ram = ram            
         self.storage = storage
-        self.rating = rating     
+        self.rating = rating      
 
     def __str__(self):
-        return f"{self.nama} (RAM: {self.ram}GB, Storage: {self.storage}GB) - Rp{self.harga:,} [Rating: {self.rating}]"
+        return f"{self.nama} (RAM: {self.ram}GB) - Rp{self.harga:,} [★{self.rating}]"

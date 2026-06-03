@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-
 from models import Handphone
 from algorithms import linear_search_recommendation, selection_sort_by_price
-from data_structures import HistoryLinkedList
+from data_structures import HistoryLinkedList, ComparisonQueue, HandphoneBST
 
 class RecommendationApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Sistem Rekomendasi HP - Kelompok 5")
-        self.root.geometry("800x600")
+        self.root.title("Sistem Rekomendasi HP - Kelompok 9")
+        self.root.geometry("920x680")
 
         self.database_hp = [
             Handphone(1, "Infinix Note 40", 2500000, 8, 256, 4.5),
@@ -20,92 +19,101 @@ class RecommendationApp:
         ]
         self.id_counter = 6
         self.history_log = HistoryLinkedList()
+        self.compare_queue = ComparisonQueue()
 
         self.create_widgets()
         self.refresh_table(self.database_hp)
 
     def create_widgets(self):
-        self.lbl_title = tk.Label(self.root, text="Daftar Handphone / Menu Utama CRUD", font=("Arial", 12, "bold"))
-        self.lbl_title.pack(pady=5)
+        self.lbl_title = tk.Label(self.root, text="Daftar Handphone / Menu Utama CRUD", font=("Arial", 11, "bold"))
+        self.lbl_title.pack(pady=3)
 
         table_frame = tk.Frame(self.root)
-        table_frame.pack(padx=15, fill=tk.X)
+        table_frame.pack(padx=10, fill=tk.X)
 
-        self.tree = ttk.Treeview(table_frame, columns=("ID", "Nama", "Harga", "RAM", "Storage", "Rating"), show="headings", height=6)
+        self.tree = ttk.Treeview(table_frame, columns=("ID", "Nama", "Harga", "RAM", "Storage", "Rating"), show="headings", height=5)
         self.tree.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        
         for col in ("ID", "Nama", "Harga", "RAM", "Storage", "Rating"):
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=110, anchor=tk.CENTER)
+            self.tree.column(col, width=100, anchor=tk.CENTER)
 
-  
         self.tree.bind("<<TreeviewSelect>>", self.on_row_select)
+        tk.Button(self.root, text="Tampilkan Semua Data", command=lambda: self.refresh_table(self.database_hp), bg="lightgray").pack(pady=2)
+        
+        form_frame = tk.LabelFrame(self.root, text=" Form Manipulasi Data HP (CRUD) ")
+        form_frame.pack(padx=10, pady=2, fill=tk.X)
 
-        tk.Button(self.root, text="Tampilkan Semua Data", command=lambda: self.refresh_table(self.database_hp), bg="lightgray").pack(pady=3)
+        tk.Label(form_frame, text="Nama HP:").grid(row=0, column=0, padx=5, pady=2, sticky="e")
+        self.ent_nama = tk.Entry(form_frame, width=15)
+        self.ent_nama.grid(row=0, column=1, padx=5, pady=2)
 
-        form_frame = tk.LabelFrame(self.root, text=" Form Manipulasi Data HP ", font=("Arial", 10, "bold"))
-        form_frame.pack(padx=15, pady=5, fill=tk.X)
+        tk.Label(form_frame, text="Harga (Rp):").grid(row=0, column=2, padx=5, pady=2, sticky="e")
+        self.ent_harga = tk.Entry(form_frame, width=15)
+        self.ent_harga.grid(row=0, column=3, padx=5, pady=2)
 
-        tk.Label(form_frame, text="Nama HP:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        self.ent_nama = tk.Entry(form_frame, width=20)
-        self.ent_nama.grid(row=0, column=1, padx=5, pady=5)
+        tk.Label(form_frame, text="RAM (GB):").grid(row=1, column=0, padx=5, pady=2, sticky="e")
+        self.ent_ram = tk.Entry(form_frame, width=15)
+        self.ent_ram.grid(row=1, column=1, padx=5, pady=2)
 
-        tk.Label(form_frame, text="Harga (Rp):").grid(row=0, column=2, padx=5, pady=5, sticky="e")
-        self.ent_harga = tk.Entry(form_frame, width=20)
-        self.ent_harga.grid(row=0, column=3, padx=5, pady=5)
+        tk.Label(form_frame, text="Storage (GB):").grid(row=1, column=2, padx=5, pady=2, sticky="e")
+        self.ent_storage = tk.Entry(form_frame, width=15)
+        self.ent_storage.grid(row=1, column=3, padx=5, pady=2)
 
-        tk.Label(form_frame, text="RAM (GB):").grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        self.ent_ram = tk.Entry(form_frame, width=20)
-        self.ent_ram.grid(row=1, column=1, padx=5, pady=5)
+        tk.Label(form_frame, text="Rating (0-5):").grid(row=2, column=0, padx=5, pady=2, sticky="e")
+        self.ent_rating = tk.Entry(form_frame, width=15)
+        self.ent_rating.grid(row=2, column=1, padx=5, pady=2)
 
-        tk.Label(form_frame, text="Storage (GB):").grid(row=1, column=2, padx=5, pady=5, sticky="e")
-        self.ent_storage = tk.Entry(form_frame, width=20)
-        self.ent_storage.grid(row=1, column=3, padx=5, pady=5)
-
-        tk.Label(form_frame, text="Rating (0-5):").grid(row=2, column=0, padx=5, pady=5, sticky="e")
-        self.ent_rating = tk.Entry(form_frame, width=20)
-        self.ent_rating.grid(row=2, column=1, padx=5, pady=5)
-
-     
         crud_btn_frame = tk.Frame(form_frame)
-        crud_btn_frame.grid(row=3, column=0, columnspan=4, pady=8)
+        crud_btn_frame.grid(row=3, column=0, columnspan=4, pady=5)
+        tk.Button(crud_btn_frame, text="Tambah HP (Create)", command=self.add_hp, bg="#a3e635").pack(side=tk.LEFT, padx=5)
+        tk.Button(crud_btn_frame, text="Simpan (Update)", command=self.update_hp, bg="#fde047").pack(side=tk.LEFT, padx=5)
+        tk.Button(crud_btn_frame, text="Hapus (Delete)", command=self.delete_hp, bg="#f87171", fg="white").pack(side=tk.LEFT, padx=5)
 
-        tk.Button(crud_btn_frame, text="Tambah HP (Create)", command=self.add_hp, bg="#a3e635", fg="black").pack(side=tk.LEFT, padx=10)
-        tk.Button(crud_btn_frame, text="Simpan Perubahan (Update)", command=self.update_hp, bg="#fde047", fg="black").pack(side=tk.LEFT, padx=10)
-        tk.Button(crud_btn_frame, text="Hapus HP (Delete)", command=self.delete_hp, bg="#f87171", fg="white").pack(side=tk.LEFT, padx=10)
+        rec_frame = tk.LabelFrame(self.root, text=" Sistem Rekomendasi (Linear Search & Selection Sort) ", fg="blue")
+        rec_frame.pack(padx=10, pady=2, fill=tk.X)
 
-       
-        rec_frame = tk.LabelFrame(self.root, text=" Sistem Rekomendasi Pintar ", font=("Arial", 10, "bold"), fg="blue")
-        rec_frame.pack(padx=15, pady=5, fill=tk.X)
+        tk.Label(rec_frame, text="Max Budget:").grid(row=0, column=0, padx=5, pady=5)
+        self.ent_budget = tk.Entry(rec_frame, width=12)
+        self.ent_budget.grid(row=0, column=1, padx=5, pady=5)
 
-        tk.Label(rec_frame, text="Maksimal Budget (Rp):").grid(row=0, column=0, padx=5, pady=8, sticky="e")
-        self.ent_budget = tk.Entry(rec_frame, width=15)
-        self.ent_budget.grid(row=0, column=1, padx=5, pady=8)
+        tk.Label(rec_frame, text="Min RAM:").grid(row=0, column=2, padx=5, pady=5)
+        self.ent_min_ram = tk.Entry(rec_frame, width=8)
+        self.ent_min_ram.grid(row=0, column=3, padx=5, pady=5)
 
-        tk.Label(rec_frame, text="Minimal Kapasitas RAM (GB):").grid(row=0, column=2, padx=5, pady=8, sticky="e")
-        self.ent_min_ram = tk.Entry(rec_frame, width=10)
-        self.ent_min_ram.grid(row=0, column=3, padx=5, pady=8)
+        tk.Button(rec_frame, text="Cari Rekomendasi Termurah", command=self.get_recommendation, bg="#38bdf8").grid(row=0, column=4, padx=10, pady=5)
 
-        tk.Button(rec_frame, text="Dapatkan Rekomendasi HP", command=self.get_recommendation, bg="#38bdf8", font=("Arial", 9, "bold")).grid(row=0, column=4, padx=15, pady=8)
+        bst_frame = tk.LabelFrame(self.root, text=" Pencarian Instan BST (Binary Search Tree) ", fg="purple")
+        bst_frame.pack(padx=10, pady=2, fill=tk.X)
 
-        nav_frame = tk.LabelFrame(self.root, text=" Log Riwayat Klik / Penjelajahan (Linked List) ")
-        nav_frame.pack(padx=15, pady=5, fill=tk.X)
+        tk.Label(bst_frame, text="Masukkan Target Rating (Contoh: 4.7):").pack(side=tk.LEFT, padx=10, pady=5)
+        self.ent_bst_rating = tk.Entry(bst_frame, width=8)
+        self.ent_bst_rating.pack(side=tk.LEFT, padx=5, pady=5)
+        tk.Button(bst_frame, text="Cari via BST Tree", command=self.search_bst, bg="#e9d5ff").pack(side=tk.LEFT, padx=10, pady=5)
+
+        queue_frame = tk.LabelFrame(self.root, text=" Fitur Bandingkan HP (Queue FIFO - Maksimal 3 Produk) ", fg="green")
+        queue_frame.pack(padx=10, pady=2, fill=tk.X)
+
+        tk.Button(queue_frame, text="Masukkan HP Terpilih ke Antrean Band", command=self.add_to_queue, bg="#bbf7d0").pack(side=tk.LEFT, padx=10, pady=5)
+        tk.Button(queue_frame, text="Keluarkan HP Tertua (Dequeue)", command=self.remove_from_queue, bg="#fecdd3").pack(side=tk.LEFT, padx=10, pady=5)
         
-        self.lbl_history = tk.Label(nav_frame, text="Belum ada HP yang dilirik.", font=("Arial", 10, "italic"), fg="gray")
-        self.lbl_history.pack(pady=5)
-        
-        btn_nav_container = tk.Frame(nav_frame)
-        btn_nav_container.pack(pady=2)
-        tk.Button(btn_nav_container, text="◀ Riwayat Sebelumnya", command=self.prev_history).pack(side=tk.LEFT, padx=20)
-        tk.Button(btn_nav_container, text="Riwayat Selanjutnya ▶", command=self.next_history).pack(side=tk.LEFT, padx=20)
+        self.lbl_queue_list = tk.Label(queue_frame, text="Antrean Saat Ini: (Kosong)", font=("Arial", 9, "italic"), fg="darkgreen")
+        self.lbl_queue_list.pack(side=tk.LEFT, padx=20)
 
-   
+        nav_frame = tk.LabelFrame(self.root, text=" Log Riwayat Klik / Jelajah (Double Linked List) ")
+        nav_frame.pack(padx=10, pady=2, fill=tk.X)
+        self.lbl_history = tk.Label(nav_frame, text="Belum ada HP yang diklik.", font=("Arial", 9, "italic"), fg="gray")
+        self.lbl_history.pack(pady=2)
+        
+        btn_container = tk.Frame(nav_frame)
+        btn_container.pack()
+        tk.Button(btn_container, text="◀ Riwayat Sebelumnya", command=self.prev_history).pack(side=tk.LEFT, padx=10, pady=2)
+        tk.Button(btn_container, text="Riwayat Selanjutnya ▶", command=self.next_history).pack(side=tk.LEFT, padx=10, pady=2)
+
     def refresh_table(self, data_list):
         for row in self.tree.get_children():
             self.tree.delete(row)
         for hp in data_list:
             self.tree.insert("", tk.END, values=(hp.id, hp.nama, f"Rp{hp.harga:,}", hp.ram, hp.storage, hp.rating))
-
 
     def add_hp(self):
         try:
@@ -114,24 +122,19 @@ class RecommendationApp:
             ram = int(self.ent_ram.get())
             storage = int(self.ent_storage.get())
             rating = float(self.ent_rating.get())
+            if not nama: raise ValueError
             
-            if not nama:
-                raise ValueError
-                
             new_hp = Handphone(self.id_counter, nama, harga, ram, storage, rating)
             self.database_hp.append(new_hp)
             self.id_counter += 1
             self.refresh_table(self.database_hp)
-            messagebox.showinfo("Sukses", f"Berhasil menambahkan {nama} ke list!")
+            messagebox.showinfo("Sukses", f"Berhasil menambahkan {nama}!")
         except ValueError:
-            messagebox.showerror("Gagal Input", "Pastikan seluruh kolom form terisi dan format data benar!")
-
+            messagebox.showerror("Error", "Format input salah / belum lengkap!")
 
     def on_row_select(self, event):
         selected = self.tree.focus()
-        if not selected: 
-            return
-            
+        if not selected: return
         values = self.tree.item(selected, 'values')
         
         self.ent_nama.delete(0, tk.END)
@@ -149,19 +152,14 @@ class RecommendationApp:
         for hp in self.database_hp:
             if hp.id == id_hp:
                 self.history_log.add_history(hp)
-                self.lbl_history.config(text=f"Melihat: {hp.nama} | Harga: Rp{hp.harga:,}", fg="black", font=("Arial", 10, "bold"))
+                self.lbl_history.config(text=f"Melihat: {hp.nama} [★{hp.rating}]", fg="black")
                 break
-
 
     def update_hp(self):
         selected = self.tree.focus()
-        if not selected:
-            messagebox.showwarning("Pilih Data", "Silakan klik salah satu baris HP pada tabel terlebih dahulu!")
-            return
-        
+        if not selected: return
         values = self.tree.item(selected, 'values')
         id_target = int(values[0])
-
         try:
             for hp in self.database_hp:
                 if hp.id == id_target:
@@ -172,54 +170,84 @@ class RecommendationApp:
                     hp.rating = float(self.ent_rating.get())
                     break
             self.refresh_table(self.database_hp)
-            messagebox.showinfo("Sukses", "Data Handphone berhasil diperbarui!")
+            messagebox.showinfo("Sukses", "Data HP diperbarui!")
         except ValueError:
-            messagebox.showerror("Gagal Update", "Format pengisian angka baru salah!")
-
+            messagebox.showerror("Error", "Gagal memperbarui data!")
 
     def delete_hp(self):
         selected = self.tree.focus()
-        if not selected:
-            messagebox.showwarning("Pilih Data", "Silakan klik data pada tabel yang ingin dihapus!")
-            return
-            
+        if not selected: return
         values = self.tree.item(selected, 'values')
         id_target = int(values[0])
-
         self.database_hp = [hp for hp in self.database_hp if hp.id != id_target]
         self.refresh_table(self.database_hp)
-        messagebox.showinfo("Sukses", "Data produk HP berhasil dihapus!")
-
+        messagebox.showinfo("Sukses", "Data HP dihapus!")
 
     def get_recommendation(self):
         try:
             budget = int(self.ent_budget.get())
             min_ram = int(self.ent_min_ram.get())
-
-            filtered_hp = linear_search_recommendation(self.database_hp, budget, min_ram)
-
-            sorted_hp = selection_sort_by_price(filtered_hp, ascending=True)
-
-            if sorted_hp:
-                self.refresh_table(sorted_hp)
-                messagebox.showinfo("Rekomendasi Berhasil", f"Ditemukan {len(sorted_hp)} HP ideal sesuai kriteria Anda!")
-            else:
-                messagebox.showinfo("Tidak Cocok", "Tidak ada HP yang sesuai dengan kombinasi budget & RAM tersebut.")
+            filtered = linear_search_recommendation(self.database_hp, budget, min_ram)
+            sorted_res = selection_sort_by_price(filtered, ascending=True)
+            self.refresh_table(sorted_res)
         except ValueError:
-            messagebox.showerror("Kriteria Salah", "Tolong isi kriteria budget dan minimal RAM dalam bentuk angka!")
+            messagebox.showerror("Error", "Isi kriteria dengan angka!")
 
+    def search_bst(self):
+        try:
+            target = float(self.ent_bst_rating.get())
+            tree = HandphoneBST()
+            for hp in self.database_hp:
+                tree.insert(hp)
+            
+            hasil_hp = tree.search_exact_rating(target)
+            if hasil_hp:
+                self.refresh_table([hasil_hp])
+                messagebox.showinfo("BST Found", f"Ditemukan via BST:\n{hasil_hp}")
+            else:
+                messagebox.showinfo("BST Not Found", "Tidak ada HP dengan rating bernilai tepat sebesar itu.")
+        except ValueError:
+            messagebox.showerror("Error", "Masukkan format angka desimal untuk rating BST!")
+
+    def add_to_queue(self):
+        selected = self.tree.focus()
+        if not selected:
+            messagebox.showwarning("Peringatan", "Pilih HP pada tabel terlebih dahulu!")
+            return
+        values = self.tree.item(selected, 'values')
+        id_hp = int(values[0])
+        
+        for hp in self.database_hp:
+            if hp.id == id_hp:
+                berhasil = self.compare_queue.enqueue(hp)
+                if berhasil:
+                    self.update_queue_label()
+                else:
+                    messagebox.showwarning("Antrean Penuh", "Maksimal membandingkan 3 HP. Keluarkan HP lama terlebih dahulu!")
+                break
+
+    def remove_from_queue(self):
+        item_keluar = self.compare_queue.dequeue()
+        if item_keluar:
+            messagebox.showinfo("Queue Dequeue", f"{item_keluar.nama} dikeluarkan dari list perbandingan.")
+            self.update_queue_label()
+        else:
+            messagebox.showinfo("Queue Kosong", "Tidak ada data HP di dalam antrean.")
+
+    def update_queue_label(self):
+        items = self.compare_queue.get_all()
+        if not items:
+            self.lbl_queue_list.config(text="Antrean Saat Ini: (Kosong)")
+        else:
+            teks_list = " vs ".join([hp.nama for hp in items])
+            self.lbl_queue_list.config(text=f"Bandingkan: [ {teks_list} ]")
 
     def prev_history(self):
         hp = self.history_log.get_previous()
-        if hp:
-            self.lbl_history.config(text=f"Melihat (History): {hp.nama} | Harga: Rp{hp.harga:,}")
-        else:
-            messagebox.showinfo("Batas Riwayat", "Anda sudah berada pada riwayat klik paling awal.")
-
+        if hp: self.lbl_history.config(text=f"Melihat (History): {hp.nama} [★{hp.rating}]")
+        else: messagebox.showinfo("Info", "Batas riwayat awal tercapai.")
 
     def next_history(self):
         hp = self.history_log.get_next()
-        if hp:
-            self.lbl_history.config(text=f"Melihat (History): {hp.nama} | Harga: Rp{hp.harga:,}")
-        else:
-            messagebox.showinfo("Batas Riwayat", "Anda sudah berada pada riwayat klik paling akhir.")
+        if hp: self.lbl_history.config(text=f"Melihat (History): {hp.nama} [★{hp.rating}]")
+        else: messagebox.showinfo("Info", "Batas riwayat akhir tercapai.")

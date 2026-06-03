@@ -1,41 +1,59 @@
-Sistem Rekomendasi Handphone 
+# Sistem Rekomendasi Handphone (GUI & Struktur Data)
 
-Aplikasi Sistem Rekomendasi Handphone adalah proyek perangkat lunak berbasis Desktop GUI (tkinter) yang dirancang untuk membantu pengguna menyaring, mengurutkan, dan menemukan perangkat hanphone ideal sesuai anggaran (budget) dan kebutuhan kapasitas RAM tertentu. 
+Aplikasi **Sistem Rekomendasi Handphone** adalah proyek perangkat lunak berbasis Desktop GUI (*Graphical User Interface*) yang dirancang menggunakan library **Tkinter**. Aplikasi ini berfungsi untuk membantu pengguna dalam mengelola basis data *handphone* (CRUD), menyaring rekomendasi berdasarkan kriteria budget, membandingkan produk, hingga melacak riwayat navigasi secara dinamis.
 
-Proyek ini dibuat untuk memenuhi syarat Ujian Akhir Praktikum (UAP) Modul Algoritma dan Struktur Data Dasar pada Program Studi S1 Sistem Informasi, Universitas Lampung.
+Proyek ini dibuat untuk memenuhi syarat **Ujian Akhir Praktikum (UAP) Modul Algoritma dan Struktur Data Dasar pada Program Studi S1 Sistem Informasi, Universitas Lampung.
 
-Anggota Kelompok 9 (Kelas B)
+ Anggota Kelompok 5 (Kelas B)
 1. Dana Risqi Wijaya
 2. Muhammad Hibatullah
 3. Pandu Winata
 4. Sekar Ayu Maheswari
 5. Gita Tri Juliet Marbun
 
-Fitur Utama Aplikasi
-Aplikasi ini menggabungkan pengelolaan data internal dan sistem kecerdasan rekomendasi produk dengan fungsionalitas utama sebagai berikut:
 
-1. Sistem Rekomendasi Pintar (Searching & Sorting): Filtering (Linear Search): Menyaring basis data secara dinamis berdasarkan batas harga maksimum dan kapasitas RAM minimum yang diinginkan pengguna.
-   
-2. Ranking (Selection Sort): Mengurutkan hasil penyaringan produk secara otomatis berdasarkan harga termurah (ascending) guna mempermudah keputusan pembelian.
+ Fitur Utama Aplikasi
+Aplikasi ini mengintegrasikan manajemen data internal serta fungsionalitas struktur data tingkat lanjut ke dalam antarmuka yang ramah pengguna:
 
-3. Manajemen Data CRUD Lengkap:
-   Create: Admin/User dapat menambahkan data produk Handphone baru lengkap dengan spesifikasi teknisnya.
-   Read: Menampilkan visualisasi data berupa tabel interaktif menggunakan komponen ttk.Treeview.
-   Update: Memperbarui data spesifikasi atau harga smartphone yang sudah terdaftar secara langsung dari GUI.
-   Delete: Menghapus produk smartphone dari basis data memori.
-   
-4. Log Navigasi Riwayat Penjelajahan (Double Linked List):
-   Mencatat jejak digital setiap kali pengguna mengeklik baris produk tertentu di tabel. Pengguna dapat melacak kembali produk apa saja yang baru dilihatnya menggunakan fitur tombol ◀ Riwayat Sebelumnya` dan `Riwayat Selanjutnya ▶.
+1. Manajemen Data CRUD Lengkap (In-Memory Database)
+   Create:Menambahkan data produk handphone baru ke dalam sistem melalui form input.
+     Read: Menampilkan data spesifikasi lengkap secara visual menggunakan komponen `ttk.Treeview`.
+     Update:Memperbarui data spesifikasi, harga, atau rating produk yang dipilih langsung dari tabel.
+     Delete: Menghapus produk handphone tertentu dari daftar memori sistem.
 
----
+2. Sistem Rekomendasi Pintar (Filtering & Ranking)
+   Linear Search:Menyaring basis data secara dinamis berdasarkan batas harga maksimum (*Max Budget*) dan kapasitas RAM minimum.
+   Selection Sort: Mengurutkan hasil penyaringan produk secara otomatis dari harga termurah (*ascending*) untuk mempermudah pengambilan keputusan.
 
-Implementasi Materi Algoritma & Struktur Data
-Sesuai dengan ketentuan regulasi UAP, aplikasi ini dibangun secara murni tanpa menggunakan external libraries data science (seperti pandas atau scikit-learn), melainkan mengimplementasikan 6 materi utama secara manual:
+3. Pencarian Instan Tingkat Lanjut (Binary Search Tree - BST)
+   Melakukan pencarian data *handphone* secara cepat berdasarkan nilai kecocokan rating yang tepat (*exact rating target*) menggunakan struktur pohon biner.
 
-1. Object-Oriented Programming (OOP): Penggunaan struktur class dan pembentukan object Handphone sebagai blueprint representasi data entitas.
-2. Array / List (Collection): Memanfaatkan tipe data List bawaan Python sebagai wadah penyimpanan koleksi data utama (in-memory database).
-3. Double Linked List (Struktur Data Berkait Dua Arah): Pembuatan struktur berkait secara manual (Node, head, tail, next, prev) untuk menggerakkan pointer riwayat penjelajahan produk.
-4. Linear Search (Searching): Algoritma pencarian sekuensial langkah demi langkah untuk menyaring kriteria spesifikasi HP.
-5. Selection Sort (Sorting): Algoritma pengurutan data dengan skema mencari nilai ekstrem terkecil untuk menukar posisi elemen harga secara efisien.
-6. Tkinter UI (Graphical User Interface): Pembangunan antarmuka grafis ramah pengguna (user-friendly) sebagai wadah interaksi aplikasi.
+4. Fitur Bandingkan HP (Queue FIFO - Max 3 Produk)
+    Memasukkan maksimal 3 produk terpilih ke dalam antrean komparasi menggunakan prinsip *First-In, First-Out* (FIFO) untuk disandingkan spesifikasinya.
 
+5. Log Navigasi Riwayat Penjelajahan (Doubly Linked List)
+    Mencatat jejak digital setiap kali pengguna memilih baris produk pada tabel. Pengguna dapat bergerak maju-mundur melacak produk yang baru saja dilihat menggunakan tombol `◀ Riwayat Sebelumnya` dan `Riwayat Selanjutnya ▶`.
+
+ Implementasi Materi Algoritma & Struktur Data
+Sesuai dengan ketentuan regulasi UAP, aplikasi ini dibangun secara murni tanpa menggunakan library eksternal (seperti *pandas*), melainkan mengimplementasikan **8 cakupan materi utama** secara manual:
+
+1. Object-Oriented Programming (OOP):** Representasi entitas data smartphone menggunakan `class Handphone`.
+2. Array / List: Memanfaatkan tipe data `List` bawaan Python sebagai repositori data utama (`database_hp`).
+3. Linear Search: Algoritma pencarian sekuensial untuk menyaring spesifikasi harga dan RAM produk.
+4. Selection Sort: Algoritma pengurutan dengan skema pencarian nilai minimum untuk mengurutkan harga termurah.
+5. Doubly Linked List: Implementasi mandiri struktur berkait dua arah (`DLLNode` dengan pointer `next` dan `prev`) untuk melacak histori klik pengguna.
+6. Queue (Antrean):Penerapan struktur data antrean berbasis array dengan batas kapasitas maksimum 3 produk untuk fitur perbandingan produk.
+7. Binary Search Tree (BST): Penyusunan data ke dalam struktur pohon berdasarkan nilai `rating` untuk mempercepat pencarian data spesifik.
+8. Tkinter GUI: Pembangunan antarmuka grafis desktop terstruktur sebagai wadah interaksi pengguna dengan program.
+
+ Cara Menjalankan Aplikas
+
+Prasyarat
+Pastikan Anda sudah menginstal Python di komputer Anda (versi 3.x direkomendasikan). Library `tkinter` umumnya sudah terinstal secara bawaan bersama Python.
+
+ Langkah Eksekusi
+1. Clone atau unduh repositori ini.
+2. Buka terminal atau *command prompt* di direktori tempat file kode berada.
+3. Jalankan perintah berikut:
+   ```bash
+   python main.py

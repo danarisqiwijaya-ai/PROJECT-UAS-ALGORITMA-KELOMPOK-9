@@ -4,8 +4,8 @@ Aplikasi Sistem Rekomendasi Handphone adalah proyek perangkat lunak berbasis Des
 
 Proyek ini dibuat untuk memenuhi syarat Ujian Akhir Praktikum (UAP) Modul Algoritma dan Struktur Data Dasar pada Program Studi S1 Sistem Informasi, Universitas Lampung.
 
-Anggota Kelompok 5 (Kelas B)
-1. Dana Riskq Wijaya
+Anggota Kelompok 9 (Kelas B)
+1. Dana Risqi Wijaya
 2. Muhammad Hibatullah
 3. Pandu Winata
 4. Sekar Ayu Maheswari

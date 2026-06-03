@@ -1,312 +1,296 @@
-from tkinter import *
+import tkinter as tk
+from tkinter import messagebox, ttk
 
-class Club:
-    def __init__(self, id_club, nama, liga, poin):
-        self.__id = id_club
-        self.__nama = nama
-        self.__liga = liga
-        self.__poin = poin
+class Handphone:
+    def __init__(self, id_hp, nama, harga, ram, storage, rating):
+        self.id = id_hp
+        self.nama = nama
+        self.harga = harga        
+        self.ram = ram            
+        self.storage = storage
+        self.rating = rating     
 
-    def get_id(self):
-        return self.__id
-
-    def get_nama(self):
-        return self.__nama
-
-    def get_liga(self):
-        return self.__liga
-
-    def get_poin(self):
-        return self.__poin
-
-    def set_data(self, nama, liga, poin):
-        self.__nama = nama
-        self.__liga = liga
-        self.__poin = poin
-
-    def tampil(self):
-        return f"{self.__id} | {self.__nama} | {self.__liga} | Poin: {self.__poin}"
-
+    def __str__(self):
+        return f"{self.nama} (RAM: {self.ram}GB, Storage: {self.storage}GB) - Rp{self.harga:,} [Rating: {self.rating}]"
 
 class Node:
     def __init__(self, data):
-        self.data = data
-        self.next = None
+        self.data = data  
+        self.next = None  
+        self.prev = None  
 
-
-class LinkedList:
+class HistoryLinkedList:
     def __init__(self):
         self.head = None
+        self.tail = None
+        self.current = None  
 
-    def tambah(self, data):
-        new_node = Node(data)
+    def add_history(self, hp_object):
+        new_node = Node(hp_object)
         if not self.head:
             self.head = new_node
-            return
-        cur = self.head
-        while cur.next:
-            cur = cur.next
-        cur.next = new_node
+            self.tail = new_node
+        else:
+            self.tail.next = new_node
+            new_node.prev = self.tail
+            self.tail = new_node
+        self.current = self.tail  
 
-    def hapus(self, id_club):
-        cur = self.head
-        prev = None
-        while cur:
-            if cur.data.get_id() == id_club:
-                if prev:
-                    prev.next = cur.next
-                else:
-                    self.head = cur.next
-                return True
-            prev = cur
-            cur = cur.next
-        return False
+    def get_previous(self):
+        if self.current and self.current.prev:
+            self.current = self.current.prev
+            return self.current.data
+        return None
 
-    def update(self, id_club, nama, liga, poin):
-        cur = self.head
-        while cur:
-            if cur.data.get_id() == id_club:
-                cur.data.set_data(nama, liga, poin)
-                return True
-            cur = cur.next
-        return False
+    def get_next(self):
+        if self.current and self.current.next:
+            self.current = self.current.next
+            return self.current.data
+        return None
 
-    def tampil_semua(self):
-        hasil = []
-        cur = self.head
-        while cur:
-            hasil.append(cur.data)
-            cur = cur.next
-        return hasil
+def linear_search_recommendation(hp_list, max_harga, min_ram):
+    hasil_filter = []
+    for hp in hp_list:
+        if hp.harga <= max_harga and hp.ram >= min_ram:
+            hasil_filter.append(hp)
+    return hasil_filter
 
-
-class Stack:
-    def __init__(self):
-        self.data = []
-
-    def push(self, item):
-        self.data.append(item)
-
-    def pop(self):
-        if self.data:
-            return self.data.pop()
-
-    def tampil(self):
-        return self.data
-
-
-class Queue:
-    def __init__(self):
-        self.data = []
-
-    def enqueue(self, item):
-        self.data.append(item)
-
-    def dequeue(self):
-        if self.data:
-            return self.data.pop(0)
-
-    def tampil(self):
-        return self.data
-
-
-def cari_club(data, keyword):
-    hasil = []
-    for c in data:
-        if keyword.lower() in c.get_nama().lower():
-            hasil.append(c)
-    return hasil
-
-
-def bubble_sort(data):
-    n = len(data)
+def selection_sort_by_price(hp_list, ascending=True):
+    n = len(hp_list)
     for i in range(n):
-        for j in range(n - i - 1):
-            if data[j].get_poin() < data[j+1].get_poin():
-                data[j], data[j+1] = data[j+1], data[j]
-    return data
-
-
-liga_map = {}
-
-def tambah_ke_liga(club):
-    liga = club.get_liga()
-    if liga not in liga_map:
-        liga_map[liga] = []
-    liga_map[liga].append(club)
-
-
-class TreeNode:
-    def __init__(self, club):
-        self.club = club
-        self.left = None
-        self.right = None
-
-
-class BST:
-    def __init__(self):
-        self.root = None
-
-    def insert(self, club):
-        def _insert(node, club):
-            if node is None:
-                return TreeNode(club)
-            if club.get_poin() < node.club.get_poin():
-                node.left = _insert(node.left, club)
+        min_max_idx = i
+        for j in range(i + 1, n):
+            if ascending:
+                if hp_list[j].harga < hp_list[min_max_idx].harga:
+                    min_max_idx = j
             else:
-                node.right = _insert(node.right, club)
-            return node
-
-        self.root = _insert(self.root, club)
-
-    def inorder(self):
-        hasil = []
-
-        def _in(node):
-            if node:
-                _in(node.left)
-                hasil.append(node.club)
-                _in(node.right)
-
-        _in(self.root)
-        return hasil[::-1]
+                if hp_list[j].harga > hp_list[min_max_idx].harga:
+                    min_max_idx = j
+        hp_list[i], hp_list[min_max_idx] = hp_list[min_max_idx], hp_list[i]
+    return hp_list
 
 
-club_list = LinkedList()
-history = Stack()
-watchlist = Queue()
+class RecommendationApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sistem Rekomendasi HP - Kelompok 5")
+        self.root.geometry("800x600")
 
-root = Tk()
-root.title("Football Recommendation System")
-root.geometry("1000x750")
-root.configure(bg="#101820")
+        self.database_hp = [
+            Handphone(1, "Infinix Note 40", 2500000, 8, 256, 4.5),
+            Handphone(2, "Samsung Galaxy A55", 5900000, 8, 256, 4.7),
+            Handphone(3, "Xiaomi Redmi Note 13", 2300000, 6, 128, 4.3),
+            Handphone(4, "iPhone 15 Pro", 19000000, 8, 128, 4.9),
+            Handphone(5, "Vivo V30", 4200000, 12, 512, 4.6)
+        ]
+        self.id_counter = 6
+        self.history_log = HistoryLinkedList()
 
-Label(root, text="⚽ FOOTBALL RECOMMENDATION SYSTEM",
-      bg="#101820", fg="white",
-      font=("Segoe UI", 22, "bold")).pack(pady=10)
+        self.create_widgets()
+        self.refresh_table(self.database_hp)
 
-frame_input = Frame(root, bg="#1c2431", padx=10, pady=10)
-frame_input.pack(pady=10)
+    def create_widgets(self):
+        self.lbl_title = tk.Label(self.root, text="Daftar Handphone / Menu Utama CRUD", font=("Arial", 12, "bold"))
+        self.lbl_title.pack(pady=5)
 
-entry_id = Entry(frame_input)
-entry_id.grid(row=0, column=1)
-entry_nama = Entry(frame_input)
-entry_nama.grid(row=1, column=1)
-entry_liga = Entry(frame_input)
-entry_liga.grid(row=2, column=1)
-entry_poin = Entry(frame_input)
-entry_poin.grid(row=3, column=1)
+        table_frame = tk.Frame(self.root)
+        table_frame.pack(padx=15, fill=tk.X)
 
-Label(frame_input, text="ID", bg="#1c2431", fg="white").grid(row=0, column=0)
-Label(frame_input, text="Nama", bg="#1c2431", fg="white").grid(row=1, column=0)
-Label(frame_input, text="Liga", bg="#1c2431", fg="white").grid(row=2, column=0)
-Label(frame_input, text="Poin", bg="#1c2431", fg="white").grid(row=3, column=0)
+        self.tree = ttk.Treeview(table_frame, columns=("ID", "Nama", "Harga", "RAM", "Storage", "Rating"), show="headings", height=6)
+        self.tree.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        for col in ("ID", "Nama", "Harga", "RAM", "Storage", "Rating"):
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=110, anchor=tk.CENTER)
 
-frame_list = Frame(root)
-frame_list.pack(pady=10)
+  
+        self.tree.bind("<<TreeviewSelect>>", self.on_row_select)
 
-scroll = Scrollbar(frame_list)
-scroll.pack(side=RIGHT, fill=Y)
+        tk.Button(self.root, text="Tampilkan Semua Data", command=lambda: self.refresh_table(self.database_hp), bg="lightgray").pack(pady=3)
 
-listbox = Listbox(frame_list, width=120, height=18, yscrollcommand=scroll.set)
-listbox.pack()
+        form_frame = tk.LabelFrame(self.root, text=" Form Manipulasi Data HP ", font=("Arial", 10, "bold"))
+        form_frame.pack(padx=15, pady=5, fill=tk.X)
 
-scroll.config(command=listbox.yview)
+        tk.Label(form_frame, text="Nama HP:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.ent_nama = tk.Entry(form_frame, width=20)
+        self.ent_nama.grid(row=0, column=1, padx=5, pady=5)
 
+        tk.Label(form_frame, text="Harga (Rp):").grid(row=0, column=2, padx=5, pady=5, sticky="e")
+        self.ent_harga = tk.Entry(form_frame, width=20)
+        self.ent_harga.grid(row=0, column=3, padx=5, pady=5)
 
-def refresh():
-    listbox.delete(0, END)
-    for c in club_list.tampil_semua():
-        listbox.insert(END, c.tampil())
+        tk.Label(form_frame, text="RAM (GB):").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.ent_ram = tk.Entry(form_frame, width=20)
+        self.ent_ram.grid(row=1, column=1, padx=5, pady=5)
 
+        tk.Label(form_frame, text="Storage (GB):").grid(row=1, column=2, padx=5, pady=5, sticky="e")
+        self.ent_storage = tk.Entry(form_frame, width=20)
+        self.ent_storage.grid(row=1, column=3, padx=5, pady=5)
 
-def tambah():
-    c = Club(int(entry_id.get()), entry_nama.get(), entry_liga.get(), int(entry_poin.get()))
-    club_list.tambah(c)
-    tambah_ke_liga(c)
-    refresh()
+        tk.Label(form_frame, text="Rating (0-5):").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.ent_rating = tk.Entry(form_frame, width=20)
+        self.ent_rating.grid(row=2, column=1, padx=5, pady=5)
 
+     
+        crud_btn_frame = tk.Frame(form_frame)
+        crud_btn_frame.grid(row=3, column=0, columnspan=4, pady=8)
 
-def update():
-    club_list.update(int(entry_id.get()), entry_nama.get(), entry_liga.get(), int(entry_poin.get()))
-    refresh()
+        tk.Button(crud_btn_frame, text="Tambah HP (Create)", command=self.add_hp, bg="#a3e635", fg="black").pack(side=tk.LEFT, padx=10)
+        tk.Button(crud_btn_frame, text="Simpan Perubahan (Update)", command=self.update_hp, bg="#fde047", fg="black").pack(side=tk.LEFT, padx=10)
+        tk.Button(crud_btn_frame, text="Hapus HP (Delete)", command=self.delete_hp, bg="#f87171", fg="white").pack(side=tk.LEFT, padx=10)
 
+       
+        rec_frame = tk.LabelFrame(self.root, text=" Sistem Rekomendasi Pintar ", font=("Arial", 10, "bold"), fg="blue")
+        rec_frame.pack(padx=15, pady=5, fill=tk.X)
 
-def hapus():
-    club_list.hapus(int(entry_id.get()))
-    refresh()
+        tk.Label(rec_frame, text="Maksimal Budget (Rp):").grid(row=0, column=0, padx=5, pady=8, sticky="e")
+        self.ent_budget = tk.Entry(rec_frame, width=15)
+        self.ent_budget.grid(row=0, column=1, padx=5, pady=8)
 
+        tk.Label(rec_frame, text="Minimal Kapasitas RAM (GB):").grid(row=0, column=2, padx=5, pady=8, sticky="e")
+        self.ent_min_ram = tk.Entry(rec_frame, width=10)
+        self.ent_min_ram.grid(row=0, column=3, padx=5, pady=8)
 
-def cari():
-    hasil = cari_club(club_list.tampil_semua(), entry_nama.get())
-    listbox.delete(0, END)
-    for c in hasil:
-        listbox.insert(END, c.tampil())
+        tk.Button(rec_frame, text="Dapatkan Rekomendasi HP", command=self.get_recommendation, bg="#38bdf8", font=("Arial", 9, "bold")).grid(row=0, column=4, padx=15, pady=8)
 
+        nav_frame = tk.LabelFrame(self.root, text=" Log Riwayat Klik / Penjelajahan (Linked List) ")
+        nav_frame.pack(padx=15, pady=5, fill=tk.X)
+        
+        self.lbl_history = tk.Label(nav_frame, text="Belum ada HP yang dilirik.", font=("Arial", 10, "italic"), fg="gray")
+        self.lbl_history.pack(pady=5)
+        
+        btn_nav_container = tk.Frame(nav_frame)
+        btn_nav_container.pack(pady=2)
+        tk.Button(btn_nav_container, text="◀ Riwayat Sebelumnya", command=self.prev_history).pack(side=tk.LEFT, padx=20)
+        tk.Button(btn_nav_container, text="Riwayat Selanjutnya ▶", command=self.next_history).pack(side=tk.LEFT, padx=20)
 
-def sort():
-    data = bubble_sort(club_list.tampil_semua())
-    listbox.delete(0, END)
-    for c in data:
-        listbox.insert(END, c.tampil())
-
-
-def bst_rekomendasi():
-    bst = BST()
-    for c in club_list.tampil_semua():
-        bst.insert(c)
-
-    hasil = bst.inorder()
-    listbox.delete(0, END)
-    listbox.insert(END, "=== REKOMENDASI BST ===")
-    for c in hasil[:5]:
-        listbox.insert(END, c.tampil())
-
-
-def lihat_liga():
-    listbox.delete(0, END)
-    for liga, clubs in liga_map.items():
-        listbox.insert(END, f"=== {liga} ===")
-        for c in clubs:
-            listbox.insert(END, c.tampil())
-
-
-def history_view():
-    listbox.delete(0, END)
-    for h in history.tampil():
-        listbox.insert(END, h)
+   
+    def refresh_table(self, data_list):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        for hp in data_list:
+            self.tree.insert("", tk.END, values=(hp.id, hp.nama, f"Rp{hp.harga:,}", hp.ram, hp.storage, hp.rating))
 
 
-def watchlist_view():
-    listbox.delete(0, END)
-    for w in watchlist.tampil():
-        listbox.insert(END, w)
+    def add_hp(self):
+        try:
+            nama = self.ent_nama.get()
+            harga = int(self.ent_harga.get())
+            ram = int(self.ent_ram.get())
+            storage = int(self.ent_storage.get())
+            rating = float(self.ent_rating.get())
+            
+            if not nama:
+                raise ValueError
+                
+            new_hp = Handphone(self.id_counter, nama, harga, ram, storage, rating)
+            self.database_hp.append(new_hp)
+            self.id_counter += 1
+            self.refresh_table(self.database_hp)
+            messagebox.showinfo("Sukses", f"Berhasil menambahkan {nama} ke list!")
+        except ValueError:
+            messagebox.showerror("Gagal Input", "Pastikan seluruh kolom form terisi dan format data benar!")
 
 
-frame_btn = Frame(root, bg="#101820")
-frame_btn.pack(pady=15)
+    def on_row_select(self, event):
+        selected = self.tree.focus()
+        if not selected: 
+            return
+            
+        values = self.tree.item(selected, 'values')
+        
+        self.ent_nama.delete(0, tk.END)
+        self.ent_nama.insert(0, values[1])
+        self.ent_harga.delete(0, tk.END)
+        self.ent_harga.insert(0, values[2].replace("Rp", "").replace(",", ""))
+        self.ent_ram.delete(0, tk.END)
+        self.ent_ram.insert(0, values[3])
+        self.ent_storage.delete(0, tk.END)
+        self.ent_storage.insert(0, values[4])
+        self.ent_rating.delete(0, tk.END)
+        self.ent_rating.insert(0, values[5])
 
-Button(frame_btn, text="Tambah", width=12, bg="#2ecc71", command=tambah).grid(row=0, column=0)
-Button(frame_btn, text="Update", width=12, bg="#f1c40f", command=update).grid(row=0, column=1)
-Button(frame_btn, text="Hapus", width=12, bg="#e74c3c", command=hapus).grid(row=0, column=2)
+        id_hp = int(values[0])
+        for hp in self.database_hp:
+            if hp.id == id_hp:
+                self.history_log.add_history(hp)
+                self.lbl_history.config(text=f"Melihat: {hp.nama} | Harga: Rp{hp.harga:,}", fg="black", font=("Arial", 10, "bold"))
+                break
 
-Button(frame_btn, text="Cari", width=12, bg="#3498db", command=cari).grid(row=1, column=0)
-Button(frame_btn, text="Sort", width=12, bg="#9b59b6", command=sort).grid(row=1, column=1)
 
-Button(frame_btn, text="BST", width=12, bg="#1abc9c", command=bst_rekomendasi).grid(row=1, column=2)
-Button(frame_btn, text="Liga", width=12, bg="#16a085", command=lihat_liga).grid(row=2, column=0)
+    def update_hp(self):
+        selected = self.tree.focus()
+        if not selected:
+            messagebox.showwarning("Pilih Data", "Silakan klik salah satu baris HP pada tabel terlebih dahulu!")
+            return
+        
+        values = self.tree.item(selected, 'values')
+        id_target = int(values[0])
 
-Button(frame_btn, text="History", width=12, bg="#34495e", command=history_view).grid(row=2, column=1)
-Button(frame_btn, text="Watchlist", width=12, bg="#2c3e50", command=watchlist_view).grid(row=2, column=2)
+        try:
+            for hp in self.database_hp:
+                if hp.id == id_target:
+                    hp.nama = self.ent_nama.get()
+                    hp.harga = int(self.ent_harga.get())
+                    hp.ram = int(self.ent_ram.get())
+                    hp.storage = int(self.ent_storage.get())
+                    hp.rating = float(self.ent_rating.get())
+                    break
+            self.refresh_table(self.database_hp)
+            messagebox.showinfo("Sukses", "Data Handphone berhasil diperbarui!")
+        except ValueError:
+            messagebox.showerror("Gagal Update", "Format pengisian angka baru salah!")
 
-club_list.tambah(Club(1, "Real Madrid", "La Liga", 95))
-club_list.tambah(Club(2, "Manchester City", "Premier League", 97))
-club_list.tambah(Club(3, "Barcelona", "La Liga", 90))
-club_list.tambah(Club(4, "Liverpool", "Premier League", 88))
-club_list.tambah(Club(5, "Bayern Munich", "Bundesliga", 92))
 
-for c in club_list.tampil_semua():
-    tambah_ke_liga(c)
+    def delete_hp(self):
+        selected = self.tree.focus()
+        if not selected:
+            messagebox.showwarning("Pilih Data", "Silakan klik data pada tabel yang ingin dihapus!")
+            return
+            
+        values = self.tree.item(selected, 'values')
+        id_target = int(values[0])
 
-refresh()
-root.mainloop()
+        self.database_hp = [hp for hp in self.database_hp if hp.id != id_target]
+        self.refresh_table(self.database_hp)
+        messagebox.showinfo("Sukses", "Data produk HP berhasil dihapus!")
+
+
+    def get_recommendation(self):
+        try:
+            budget = int(self.ent_budget.get())
+            min_ram = int(self.ent_min_ram.get())
+
+            filtered_hp = linear_search_recommendation(self.database_hp, budget, min_ram)
+
+            sorted_hp = selection_sort_by_price(filtered_hp, ascending=True)
+
+            if sorted_hp:
+                self.refresh_table(sorted_hp)
+                messagebox.showinfo("Rekomendasi Berhasil", f"Ditemukan {len(sorted_hp)} HP ideal sesuai kriteria Anda!")
+            else:
+                messagebox.showinfo("Tidak Cocok", "Tidak ada HP yang sesuai dengan kombinasi budget & RAM tersebut.")
+        except ValueError:
+            messagebox.showerror("Kriteria Salah", "Tolong isi kriteria budget dan minimal RAM dalam bentuk angka!")
+
+
+    def prev_history(self):
+        hp = self.history_log.get_previous()
+        if hp:
+            self.lbl_history.config(text=f"Melihat (History): {hp.nama} | Harga: Rp{hp.harga:,}")
+        else:
+            messagebox.showinfo("Batas Riwayat", "Anda sudah berada pada riwayat klik paling awal.")
+
+
+    def next_history(self):
+        hp = self.history_log.get_next()
+        if hp:
+            self.lbl_history.config(text=f"Melihat (History): {hp.nama} | Harga: Rp{hp.harga:,}")
+        else:
+            messagebox.showinfo("Batas Riwayat", "Anda sudah berada pada riwayat klik paling akhir.")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = RecommendationApp(root)
+    root.mainloop()

@@ -311,7 +311,7 @@ class RecommendationApp:
         try:
             budget = int(self.ent_budget.get())
             min_ram = int(self.ent_min_ram.get())
-            # Searching & Sorting
+            
             filtered = linear_search_recommendation(self.database_hp, budget, min_ram)
             sorted_res = selection_sort_by_price(filtered, ascending=True)
             self.refresh_table(sorted_res)

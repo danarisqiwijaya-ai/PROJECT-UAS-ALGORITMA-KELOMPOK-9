@@ -131,7 +131,7 @@ def selection_sort_by_price(hp_list, ascending=True):
 class RecommendationApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Sistem Rekomendasi HP - Kelompok 5 (8 Materi)")
+        self.root.title("Sistem Rekomendasi HP - Kelompok 9")
         self.root.geometry("920x680") 
 
         self.database_hp = [

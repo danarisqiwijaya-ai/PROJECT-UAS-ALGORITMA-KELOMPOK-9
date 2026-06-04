@@ -1,8 +1,8 @@
-# Sistem Rekomendasi Handphone (GUI & Struktur Data)
+Sistem Rekomendasi Handphone (GUI & Struktur Data)
 
 Aplikasi Sistem Rekomendasi Handphone adalah proyek perangkat lunak berbasis Desktop GUI yang dirancang menggunakan library Tkinter. Aplikasi ini berfungsi untuk membantu pengguna dalam mengelola basis data handphone (CRUD), menyaring rekomendasi berdasarkan kriteria budget, membandingkan produk, hingga melacak riwayat navigasi secara dinamis.
 
-Proyek ini dibuat untuk memenuhi syarat **Ujian Akhir Praktikum (UAP) Modul Algoritma dan Struktur Data Dasar pada Program Studi S1 Sistem Informasi, Universitas Lampung.
+Proyek ini dibuat untuk memenuhi syarat Ujian Akhir Praktikum (UAP) Modul Algoritma dan Struktur Data Dasar pada Program Studi S1 Sistem Informasi, Universitas Lampung.
 
  Anggota Kelompok 9 (Kelas B)
 1. Dana Risqi Wijaya
